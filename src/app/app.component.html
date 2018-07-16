@@ -1,20 +1,113 @@
-<!--The content below is only a placeholder and can be replaced.-->
-<div style="text-align:center">
-  <h1>
-    Welcome to {{ title }}!
-  </h1>
-  <img width="300" alt="Angular Logo" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTAgMjUwIj4KICAgIDxwYXRoIGZpbGw9IiNERDAwMzEiIGQ9Ik0xMjUgMzBMMzEuOSA2My4ybDE0LjIgMTIzLjFMMTI1IDIzMGw3OC45LTQzLjcgMTQuMi0xMjMuMXoiIC8+CiAgICA8cGF0aCBmaWxsPSIjQzMwMDJGIiBkPSJNMTI1IDMwdjIyLjItLjFWMjMwbDc4LjktNDMuNyAxNC4yLTEyMy4xTDEyNSAzMHoiIC8+CiAgICA8cGF0aCAgZmlsbD0iI0ZGRkZGRiIgZD0iTTEyNSA1Mi4xTDY2LjggMTgyLjZoMjEuN2wxMS43LTI5LjJoNDkuNGwxMS43IDI5LjJIMTgzTDEyNSA1Mi4xem0xNyA4My4zaC0zNGwxNy00MC45IDE3IDQwLjl6IiAvPgogIDwvc3ZnPg==">
+<div class="alert alert-success text-center" id="dashboard" role="alert">
+  <h1> Employees DASHBOARD </h1>
 </div>
-<h2>Here are some links to help you start: </h2>
-<ul>
-  <li>
-    <h2><a target="_blank" rel="noopener" href="https://angular.io/tutorial">Tour of Heroes</a></h2>
-  </li>
-  <li>
-    <h2><a target="_blank" rel="noopener" href="https://github.com/angular/angular-cli/wiki">CLI Documentation</a></h2>
-  </li>
-  <li>
-    <h2><a target="_blank" rel="noopener" href="https://blog.angular.io/">Angular blog</a></h2>
-  </li>
-</ul>
 
+<div class="container">
+
+  <!-- button to create an employee -->
+  <button class="btn btn-success" (click)="CreateEmployee()">
+    Create Employee
+    <i class="fa fa-plus" aria-hidden="true"></i>
+  </button>
+
+  <!-- Filters drop down -->
+  <div class="btn-group pull-right">
+    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      Default Employee Filters
+      <i class="fa fa-filter" aria-hidden="true"></i>
+    </button>
+    <div class="dropdown-menu">
+      <a class="dropdown-item" id="onlyMalesFilter"> Male only</a>
+      <a class="dropdown-item" id="fullTimeFilter"> Full-time only</a>
+      <a class="dropdown-item" id="olderThenFilter"> Older than 30</a>
+      <a class="dropdown-item" id="ageBetweenFilter"> Older than 35, but younger than 50</a>
+      <a class="dropdown-item" id="yearsOfExperienceFilter"> Female and 5 to 10 years of experience</a>
+      <div class="dropdown-divider"></div>
+      <a class="dropdown-item" id="clearFilter"> Clear Filter</a>
+    </div>
+  </div>
+
+  <!-- input to seach for an employee -->
+  <input class="btn btn-default  pull-right" placeholder="Search by name..." id="searchEmployee" />
+
+  <div id="operationStatus"></div>
+
+  <div class="employeeForm" *ngIf="displayForm" >
+    <div class="form-row">
+      <div class="form-group col-md-4">
+        <label for="fname">First Name</label>
+        <input type="text" class="form-control" id="fname" placeholder="First Name" name="fName" [(ngModel)]="model.fName" >
+      </div>
+      <div class="form-group col-md-4">
+        <label for="lname">Last Name</label>
+        <input type="text" class="form-control" id="lname" placeholder="Last Name" name="lName" [(ngModel)]="model.lName">
+      </div>
+      <div class="form-group col-md-4">
+        <label for="email">Email address</label>
+        <input type="email" class="form-control" id="email" placeholder="Email address" name="email" [(ngModel)]="model.email" >
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group col-md-4">
+        <label for="age">Age</label>
+        <input type="number" class="form-control" id="age" name="age" [(ngModel)]="model.age" >
+      </div>
+      <div class="form-group col-md-4">
+        <label for="gender">Gender</label>
+        <select id="gender" class="form-control" name="gender" [(ngModel)]="model.gender" >
+          <option>Male</option>
+          <option>Female</option>
+        </select>
+      </div>
+      <div class="form-group col-md-4">
+        <label for="yearsOfExperience">Years of Experience</label>
+        <input type="text" class="form-control" id="yearsOfExperience" name="yearsOfExperience"  [(ngModel)]="model.yearsOfExperience" >
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="form-check">
+        <label class="form-check-label">
+          <input class="form-check-input" type="checkbox" id="isFullTime" name="isFullTime" [(ngModel)]="model.isFullTime"> Check this if he/she is a full time employee.
+        </label>
+      </div>
+    </div>
+    <div class=text-right>
+      <button class="btn btn-default" id="cancel">Cancel</button>
+      <button #dynamicBtn class="btn btn-primary" (click)="DynamicbtnClikc()">Save</button>
+    </div>
+  </div>
+
+  <table class="table table-striped">
+    <thead class="thead-inverse">
+      <tr>
+        <th scope="col">First Name</th>
+        <th scope="col">Last Name</th>
+        <th scope="col">Email</th>
+        <th scope="col">Age</th>
+        <th scope="col">Gender</th>
+        <th scope="col">Years of experience</th>
+        <th scope="col">Full Time</th>
+        <th scope="col">Edit</th>
+        <th scope="col">Delete</th>
+      </tr>
+    </thead>
+    <tbody class="tbodyData" *ngFor="let employee of employees | async">
+      <tr>
+        <td class="fname">{{employee.fName}}</td>
+        <td class="lname">{{employee.lName}}</td>
+        <td class="email">{{employee.email}}</td>
+        <td class="age">{{employee.age}}</td>
+        <td class="gender">{{employee.gender}}</td>
+        <td class="yearsofexperience">{{employee.yearsOfExperience}}</td>
+        <td class="isfulltime">{{employee.isFullTime}}</td>
+        <td class="editEmployee">
+          <i (click)="Edit(employee)" class="fa fa-pencil" aria-hidden="true" style="color:green"></i>
+        </td>
+        <td class="deleteEmployee">
+          <i (click)="Delete(employee)" class="fa fa-pencil" aria-hidden="true" style="color:red"></i>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
