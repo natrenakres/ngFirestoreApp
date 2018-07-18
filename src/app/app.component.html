@@ -17,18 +17,18 @@
       <i class="fa fa-filter" aria-hidden="true"></i>
     </button>
     <div class="dropdown-menu">
-      <a class="dropdown-item" id="onlyMalesFilter"> Male only</a>
-      <a class="dropdown-item" id="fullTimeFilter"> Full-time only</a>
-      <a class="dropdown-item" id="olderThenFilter"> Older than 30</a>
-      <a class="dropdown-item" id="ageBetweenFilter"> Older than 35, but younger than 50</a>
-      <a class="dropdown-item" id="yearsOfExperienceFilter"> Female and 5 to 10 years of experience</a>
+      <a class="dropdown-item" id="onlyMalesFilter" (click)="filterBy('BY_GENDER')" > Male only</a>
+      <a class="dropdown-item" id="fullTimeFilter" (click)="filterBy('BY_FULLTIME')" > Full-time only</a>
+      <a class="dropdown-item" id="olderThenFilter" (click)="filterBy('OLDER_THEN')" > Older than 30</a>
+      <a class="dropdown-item" id="ageBetweenFilter" (click)="filterBy('AGE_BETWEEN')" > Older than 35, but younger than 50</a>
+      <a class="dropdown-item" id="yearsOfExperienceFilter" (click)="filterBy('BY_YEARS_OF_EXPERIENCE')"> Female and 5 to 10 years of experience</a>
       <div class="dropdown-divider"></div>
-      <a class="dropdown-item" id="clearFilter"> Clear Filter</a>
+      <a class="dropdown-item" id="clearFilter" (click)="filterBy(null)">Clear Filter</a>
     </div>
   </div>
 
   <!-- input to seach for an employee -->
-  <input class="btn btn-default  pull-right" placeholder="Search by name..." id="searchEmployee" />
+  <input #search class="btn btn-default  pull-right" (keyup)="Search(search.value)" placeholder="Search by name..." id="searchEmployee" />
 
   <div id="operationStatus"></div>
 
@@ -78,36 +78,39 @@
     </div>
   </div>
 
-  <table class="table table-striped">
-    <thead class="thead-inverse">
-      <tr>
-        <th scope="col">First Name</th>
-        <th scope="col">Last Name</th>
-        <th scope="col">Email</th>
-        <th scope="col">Age</th>
-        <th scope="col">Gender</th>
-        <th scope="col">Years of experience</th>
-        <th scope="col">Full Time</th>
-        <th scope="col">Edit</th>
-        <th scope="col">Delete</th>
-      </tr>
-    </thead>
-    <tbody class="tbodyData" *ngFor="let employee of employees | async">
-      <tr>
-        <td class="fname">{{employee.fName}}</td>
-        <td class="lname">{{employee.lName}}</td>
-        <td class="email">{{employee.email}}</td>
-        <td class="age">{{employee.age}}</td>
-        <td class="gender">{{employee.gender}}</td>
-        <td class="yearsofexperience">{{employee.yearsOfExperience}}</td>
-        <td class="isfulltime">{{employee.isFullTime}}</td>
-        <td class="editEmployee">
-          <i (click)="Edit(employee)" class="fa fa-pencil" aria-hidden="true" style="color:green"></i>
-        </td>
-        <td class="deleteEmployee">
-          <i (click)="Delete(employee)" class="fa fa-pencil" aria-hidden="true" style="color:red"></i>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <div *ngIf="employees$ | async; let employees; else loading">
+    <table class="table table-striped">
+      <thead class="thead-inverse">
+        <tr>
+          <th scope="col">First Name</th>
+          <th scope="col">Last Name</th>
+          <th scope="col">Email</th>
+          <th scope="col">Age</th>
+          <th scope="col">Gender</th>
+          <th scope="col">Years of experience</th>
+          <th scope="col">Full Time</th>
+          <th scope="col">Edit</th>
+          <th scope="col">Delete</th>
+        </tr>
+      </thead>
+      <tbody class="tbodyData" *ngFor="let employee of employees">
+        <tr>
+          <td class="fname">{{employee.fName}}</td>
+          <td class="lname">{{employee.lName}}</td>
+          <td class="email">{{employee.email}}</td>
+          <td class="age">{{employee.age}}</td>
+          <td class="gender">{{employee.gender}}</td>
+          <td class="yearsofexperience">{{employee.yearsOfExperience}}</td>
+          <td class="isfulltime">{{employee.isFullTime}}</td>
+          <td class="editEmployee">
+            <i (click)="Edit(employee)" class="fa fa-pencil" aria-hidden="true" style="color:green"></i>
+          </td>
+          <td class="deleteEmployee">
+            <i (click)="Delete(employee)" class="fa fa-pencil" aria-hidden="true" style="color:red"></i>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <ng-template #loading>Loading&hellip;</ng-template>
+  </div>
 </div>

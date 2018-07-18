@@ -1,32 +1,91 @@
-import { Component, ViewChild, ElementRef } from '@angular/core';
-import { AngularFirestore, AngularFirestoreDocument, AngularFirestoreCollection } from '../../node_modules/angularfire2/firestore';
-import { Observable } from '../../node_modules/rxjs';
+import { Component, ViewChild, ElementRef } from "@angular/core";
+import {
+  AngularFirestore,
+  AngularFirestoreDocument,
+  AngularFirestoreCollection
+} from "../../node_modules/angularfire2/firestore";
+import {
+  Observable,
+  BehaviorSubject,
+  combineLatest
+} from "../../node_modules/rxjs";
+
+import { switchMap } from "../../node_modules/rxjs/operators";
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  selector: "app-root",
+  templateUrl: "./app.component.html",
+  styleUrls: ["./app.component.css"]
 })
 export class AppComponent {
-  title = 'app';
+  title = "app";
 
   isUpdate = false;
   model: Employee = new Employee();
 
-  @ViewChild('dynamicBtn') dynamicBtn: ElementRef;
+  @ViewChild("dynamicBtn") dynamicBtn: ElementRef;
   displayForm = false;
   employees: Observable<Employee[]>;
   employeeDoc: AngularFirestoreDocument<Employee>;
   employeesDoc: AngularFirestoreCollection<Employee>;
   employee: Observable<Employee>;
+  appFilter$: BehaviorSubject<string | null>;
+  employees$: Observable<Employee[]>;
 
   constructor(private db: AngularFirestore) {
-    this.employeesDoc = db.collection('employees');
-    this.employees = this.employeesDoc.valueChanges();
+    this.employeesDoc = db.collection("employees");
+    this.appFilter$ = new BehaviorSubject(null);
+
+    this.appFilter$.subscribe(x => {
+      this.employees$ = db.collection<Employee>("employees", s => {
+              return this.Query(s, x);
+            })
+            .valueChanges();
+    });
 
     // this.itemDoc = db.doc<Employee>('employees/D.Uysal');
     // this.item = this.itemDoc.valueChanges();
   }
+
+  Search(key: string) {
+    this.employees$ = this.db.collection<Employee>("employees", x => x.orderBy("fName").startAt() ).valueChanges();
+  }
+
+  Query(snapshot, key) {
+    let query: firebase.firestore.Query = snapshot;
+    switch (key) {
+      case 'BY_GENDER':
+        query = query.where("gender", "==", 'Male');
+        break;
+      case 'BY_FULLTIME':
+        query = query.where("isFullTime", "==", true);
+        break;
+      case 'OLDER_THEN':
+        query = query.where("age", ">=", 30);
+        break;
+      case 'AGE_BETWEEN':
+        query = query.where("age", ">=", 30).where("age", "<=", 50);
+        break;
+      case 'BY_YEARS_OF_EXPERIENCE':
+        query = query.where("yearsOfExperience", ">=", 5).where("yearsOfExperience", "<=", 10);
+        break;
+      default:
+        query = query.orderBy("fName", "asc");
+        break;
+    }
+    return query;
+  }
+
+  filterBy(key: string) {
+    this.appFilter$.next(key);
+  }
+  onlyMalesFilter() {
+    this.employees = this.db
+      .collection<Employee>("employees", x => x.where("gender", "==", "Male"))
+      .valueChanges();
+  }
+
+  fullTimeFilter() {}
 
   Edit(employee: Employee) {
     console.log(employee);
@@ -42,14 +101,18 @@ export class AppComponent {
   DynamicbtnClikc() {
     if (this.dynamicBtn.nativeElement.innerText === "Save") {
       const docName = `${this.model.fName.charAt(0)}.${this.model.lName}`;
-      this.employeesDoc.doc(docName).set(Object.assign({}, this.model), {
-        merge: this.isUpdate
-      }).then(x => {
-        alert('Success');
-      }).catch(err =>  {
-        console.log(err);
-        alert('Not success');
-      });
+      this.employeesDoc
+        .doc(docName)
+        .set(Object.assign({}, this.model), {
+          merge: this.isUpdate
+        })
+        .then(x => {
+          alert("Success");
+        })
+        .catch(err => {
+          console.log(err);
+          alert("Not success");
+        });
     }
   }
 
@@ -74,7 +137,7 @@ export class AppComponent {
   }
 
   filter(name: string) {
-    this.db.collection('employees', x => x.where('fName', '==',  name));
+    this.db.collection("employees", x => x.where("fName", "==", name));
   }
 }
 
