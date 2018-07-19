@@ -1,0 +1,15 @@
+<select [(ngModel)]="selectedCompetation" (change)="SelectCompetation()">
+  <option *ngFor="let competition of this.competitions" value="{{competition.id}}" >
+    {{competition.name}}
+  </option>
+</select>
+<label for="week1">Week 1</label>
+<input type="radio" id="week1" name="week" value="week-1"
+  [(ngModel)]="selectedWeeks">
+<label for="week2">Week 2</label>
+<input type="radio" id="week2" name="week" value="week-2"
+  [(ngModel)]="selectedWeeks">
+
+<p>
+  {{user?.name}}
+</p>
